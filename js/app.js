@@ -442,9 +442,6 @@ async function renderStats() {
   // 趋势图
   renderTrendChart('trendChart', records);
 
-  // 月度对比
-  renderCompare(expenses, prevRecords);
-
   // 账单明细
   renderDetail(records);
 }

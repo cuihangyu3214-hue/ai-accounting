@@ -45,9 +45,13 @@ body{
   overflow:hidden;display:flex;flex-direction:column;
   -webkit-font-smoothing:antialiased;
 }
-/* 消除 Safari 底部空白 */
-html{height:100%;height:-webkit-fill-available}
-body{min-height:100%;min-height:-webkit-fill-available}
+/* 消除底部空白 */
+html{height:100%;height:-webkit-fill-available;overflow:hidden}
+body{min-height:100%;min-height:-webkit-fill-available;max-height:100dvh}
+@media all and (display-mode:standalone){
+  body{height:100vh}
+  .tab-bar{padding-bottom:max(var(--safe-bottom),8px)}
+}
 
 /* ===== Glass base ===== */
 .glass{
@@ -152,7 +156,7 @@ body{min-height:100%;min-height:-webkit-fill-available}
   background:var(--glass-heavy);
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
   border-top:1px solid var(--glass-border);
-  padding:10px 12px calc(10px + var(--safe-bottom));
+  padding:10px 12px;
   display:flex;align-items:center;gap:10px;
 }
 .chat-input{
@@ -181,7 +185,9 @@ body{min-height:100%;min-height:-webkit-fill-available}
   background:var(--glass-heavy);
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
   border-top:1px solid var(--glass-border);
-  display:flex;padding:6px 0 calc(2px + var(--safe-bottom));
+  display:flex;padding:6px 0 0;padding-bottom:var(--safe-bottom);
+  /* PWA standalone 下贴底 */
+  padding-bottom:max(var(--safe-bottom), 2px);
 }
 .tab-item{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;

@@ -27,11 +27,14 @@ class AIService {
       return this._fallbackParse(text);
     }
 
-    const prompt = `你是一个记账助手。请从以下文字中提取记账信息，严格返回 JSON 格式，不要返回其他内容：
-{"type": "expense 或 income", "amount": 数字, "category": "分类名", "note": "简短备注"}
+    const prompt = `你是一个记账助手。请从用户的话中提取记账信息，严格返回 JSON 格式，不要返回其他内容：
+{"type": "expense 或 income", "amount": 数字, "category": "分类名", "note": "简短摘要"}
 
-可用支出分类：餐饮、交通、购物、居住、娱乐、饮品、医疗、教育、社交、其他
-可用收入分类：工资、奖金、兼职、投资、其他
+要求：
+- note 是精炼的摘要，不是用户原话。例如用户说"今天中午吃了碗面条花了20块"，note 应为"午饭面条"
+- note 控制在 2-6 个字，去掉时间、语气词等无关信息
+- 可用支出分类：餐饮、交通、购物、居住、娱乐、饮品、医疗、教育、社交、其他
+- 可用收入分类：工资、奖金、兼职、投资、其他
 
 用户输入："${text}"`;
 
@@ -170,7 +173,11 @@ class AIService {
     const amount = parseFloat(amountMatch[1]);
     if (amount <= 0) return null;
 
-    const desc = text.replace(amountMatch[0], '').replace(/[元块钱￥¥]/g, '').trim();
+    // 精炼摘要：去掉金额、语气词、时间词
+    const desc = text.replace(amountMatch[0], '')
+      .replace(/[元块钱￥¥]/g, '')
+      .replace(/今天|昨天|刚才|刚刚|上午|下午|中午|晚上|早上|花了|花的|用了|了|的|吃了|买了|坐了|打了/g, '')
+      .trim();
 
     // 判断收支
     const incomeKW = ['工资','薪水','到账','收入','奖金','兼职','外快','理财','收益','分红','利息','退款','转入','还我'];
