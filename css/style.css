@@ -45,9 +45,9 @@ body{
   overflow:hidden;display:flex;flex-direction:column;
   -webkit-font-smoothing:antialiased;
 }
-/* 全屏填充，覆盖 safe area */
-html{height:100%;overflow:hidden;background:var(--bg)}
-body{height:100%;overflow:hidden;position:fixed;top:0;left:0;right:0;bottom:0}
+/* 全屏填充，覆盖 safe area 包括 home indicator */
+html{height:100%;overflow:hidden;background:var(--glass-heavy);background-color:#E8E6F0}
+body{height:100%;overflow:hidden}
 
 /* ===== Glass base ===== */
 .glass{
