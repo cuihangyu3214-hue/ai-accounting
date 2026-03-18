@@ -49,9 +49,9 @@ body{
 html,body{height:100%;overflow:hidden;background:var(--bg)}
 html{height:-webkit-fill-available}
 body{min-height:-webkit-fill-available}
-.tab-bar{padding-bottom:max(var(--safe-bottom),8px)}
+.tab-bar{padding-bottom:34px}
 @media all and (display-mode:standalone){
-  .tab-bar{padding-bottom:max(var(--safe-bottom),20px)}
+  .tab-bar{padding-bottom:40px}
 }
 
 /* ===== Glass base ===== */
