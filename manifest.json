@@ -4,7 +4,7 @@
   "description": "崔账AI - 语音记账，AI 智能归类",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#E8E6F0",
+  "background_color": "#F0EEF6",
   "theme_color": "#6C5CE7",
   "orientation": "portrait",
   "icons": [

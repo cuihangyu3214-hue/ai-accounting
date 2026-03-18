@@ -1,59 +1,32 @@
-const CACHE_NAME = 'ai-accounting-v5';
-const ASSETS = [
-  './',
-  './index.html',
-  './css/style.css',
-  './js/store.js',
-  './js/ai.js',
-  './js/voice.js',
-  './js/chart.js',
-  './js/app.js',
-  './manifest.json',
-];
+const CACHE_NAME = 'ai-accounting-v6';
 
-// Install — cache core assets
-self.addEventListener('install', (e) => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
-  );
-  self.skipWaiting();
-});
+// Install — 直接激活，不缓存
+self.addEventListener('install', () => self.skipWaiting());
 
-// Activate — clean old caches
+// Activate — 清掉所有旧缓存
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
+      Promise.all(keys.map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
 });
 
-// Fetch — cache first, then network
+// Fetch — 永远走网络，网络失败才用缓存
 self.addEventListener('fetch', (e) => {
-  // Skip non-GET and API calls
   if (e.request.method !== 'GET') return;
-  const url = new URL(e.request.url);
-  if (url.origin !== self.location.origin && !url.href.includes('fonts.googleapis.com') && !url.href.includes('cdn.jsdelivr.net')) {
-    return;
-  }
 
   e.respondWith(
-    caches.match(e.request).then(cached => {
-      if (cached) return cached;
-      return fetch(e.request).then(response => {
-        // Cache new resources
+    fetch(e.request)
+      .then(response => {
+        // 缓存一份
         if (response.status === 200) {
           const clone = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
         }
         return response;
-      });
-    }).catch(() => {
-      // Offline fallback
-      if (e.request.destination === 'document') {
-        return caches.match('./index.html');
-      }
-    })
+      })
+      .catch(() => caches.match(e.request))
   );
 });

@@ -45,9 +45,8 @@ body{
   overflow:hidden;display:flex;flex-direction:column;
   -webkit-font-smoothing:antialiased;
 }
-/* 全屏填充，覆盖 safe area 包括 home indicator */
-html{height:100%;overflow:hidden;background:var(--glass-heavy);background-color:#E8E6F0}
-body{height:100%;overflow:hidden}
+/* 全屏填充 */
+html,body{height:100%;overflow:hidden}
 
 /* ===== Glass base ===== */
 .glass{
@@ -63,7 +62,7 @@ body{height:100%;overflow:hidden}
 
 /* ===== Pages ===== */
 .page{display:none;flex-direction:column;flex:1;overflow:hidden}
-.page.active{display:flex}
+.page.active{display:flex;overflow:visible}
 
 /* ============================================================
    记账页
@@ -181,7 +180,16 @@ body{height:100%;overflow:hidden}
   background:var(--glass-heavy);
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
   border-top:1px solid var(--glass-border);
-  display:flex;padding:6px 0 env(safe-area-inset-bottom,0px);
+  display:flex;padding:6px 0 0;
+  /* 用 after 伪元素填满底部到屏幕边缘 */
+  position:relative;
+}
+.tab-bar::after{
+  content:'';position:absolute;left:0;right:0;top:100%;
+  height:env(safe-area-inset-bottom,50px);
+  height:50px;
+  background:var(--glass-heavy);
+  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
 }
 .tab-item{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
