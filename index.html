@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="崔账AI">
+<meta name="theme-color" content="#6C5CE7">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<title>崔账AI</title>
+</head>
+<body>
+
+<!-- ============================================================
+     页面1：记账
+     ============================================================ -->
+<div class="page active" id="page-home">
+
+  <div class="home-header">
+    <div class="home-top">
+      <div class="home-title">崔账</div>
+      <div class="month-chip glass" id="monthChip">3月 ▾</div>
+    </div>
+    <div class="stat-strip">
+      <div class="stat-cell glass">
+        <div class="st-label">本月支出</div>
+        <div class="st-val red" id="statMonthExpense">0</div>
+      </div>
+      <div class="stat-cell glass">
+        <div class="st-label">今日</div>
+        <div class="st-val dark" id="statToday">0</div>
+      </div>
+      <div class="stat-cell glass">
+        <div class="st-label">预算剩余</div>
+        <div class="st-val green" id="statBudget">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-area" id="chatArea">
+    <div class="empty-state">还没有记录，说句话开始记账吧</div>
+  </div>
+
+  <div class="input-bar">
+    <input class="chat-input" id="chatInput" type="text" placeholder="输入消费内容，如：午饭35" enterkeyhint="send">
+    <button class="plus-btn" onclick="openManualForm()">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" fill="none"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-item active" data-tab="home" onclick="switchPage('home')">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      记账
+    </button>
+    <button class="tab-item" data-tab="stats" onclick="switchPage('stats')">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      统计
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     手动表单
+     ============================================================ -->
+<div class="overlay" id="manualSheet" onclick="closeSheetByOverlay(event,'manualSheet')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-bar"></div>
+    <div class="sheet-head">
+      <button class="sheet-cancel" onclick="closeManualForm()">取消</button>
+      <span class="sheet-ttl">记一笔</span>
+      <button class="sheet-done" onclick="submitManual()">完成</button>
+    </div>
+    <div class="seg">
+      <button class="seg-b on" data-type="expense" onclick="setManualType('expense')">支出</button>
+      <button class="seg-b" data-type="income" onclick="setManualType('income')">收入</button>
+    </div>
+    <div class="amt-display">
+      <span class="amt-yen">¥</span>
+      <input class="amt-input" id="amtInput" type="number" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="cat-grid" id="catGrid"></div>
+    <div class="f-group">
+      <div class="f-row"><span class="f-label">备注</span><input class="f-input" id="noteInput" placeholder="选填"></div>
+      <div class="f-row"><span class="f-label">日期</span><input class="f-input" id="dateInput" type="date"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     页面2：统计
+     ============================================================ -->
+<div class="page" id="page-stats">
+
+  <div class="stats-head">
+    <div class="stats-title">统计</div>
+    <button class="gear" onclick="openSettings()">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9c.26.6.77 1.04 1.38 1.14l.13.01H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+  </div>
+
+  <div class="stats-scroll">
+
+    <div class="month-card">
+      <div class="mc-row">
+        <div>
+          <div class="mc-month" id="statsMonthLabel">2026年3月</div>
+          <div class="mc-amount" id="statsTotal"><span class="cur">¥</span>0.00</div>
+        </div>
+        <div class="mc-nav">
+          <button onclick="changeStatsMonth(-1)"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button onclick="changeStatsMonth(1)"><svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI 总结 -->
+    <div class="sc">
+      <div class="sc-head"><span class="sc-label">AI 分析</span><span class="sc-badge">智能洞察</span></div>
+      <div class="ai-summary">
+        <div class="ai-s-row">
+          <div class="ai-s-avatar">
+            <svg viewBox="0 0 24 24" stroke-width="2"><path d="M12 8V4H8" stroke="white"/><rect x="4" y="8" width="16" height="12" rx="2" stroke="white"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2" stroke="white"/></svg>
+          </div>
+          <div class="ai-s-text" id="aiSummaryText">暂无数据</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 分类占比 -->
+    <div class="sc">
+      <div class="sc-head"><span class="sc-label">分类占比</span></div>
+      <div class="cat-list" id="catList"></div>
+    </div>
+
+    <!-- 每日趋势 -->
+    <div class="sc">
+      <div class="sc-head"><span class="sc-label">每日趋势</span></div>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+
+    <!-- 月度对比 -->
+    <div class="sc">
+      <div class="sc-head"><span class="sc-label">月度对比</span></div>
+      <div class="cmp-wrap" id="compareWrap"></div>
+    </div>
+
+    <!-- 账单明细 -->
+    <div class="sc">
+      <div class="sc-head"><span class="sc-label">账单明细</span></div>
+      <div style="padding:12px 18px 0">
+        <div class="detail-tabs">
+          <button class="detail-tab on" data-mode="day" onclick="setDetailMode('day')">按日</button>
+          <button class="detail-tab" data-mode="month" onclick="setDetailMode('month')">按月</button>
+        </div>
+      </div>
+      <div class="detail-list" id="detailList"></div>
+    </div>
+
+    <div style="height:24px"></div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-item" data-tab="home" onclick="switchPage('home')">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      记账
+    </button>
+    <button class="tab-item active" data-tab="stats" onclick="switchPage('stats')">
+      <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      统计
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     设置
+     ============================================================ -->
+<div class="overlay" id="setSheet" onclick="closeSheetByOverlay(event,'setSheet')">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-bar"></div>
+    <div class="sheet-head">
+      <button class="sheet-cancel" onclick="closeSettings()">取消</button>
+      <span class="sheet-ttl">设置</span>
+      <button class="sheet-done" onclick="saveSettings()">完成</button>
+    </div>
+    <div class="set-group-title">AI 模型</div>
+    <div class="set-group">
+      <div class="set-row">
+        <span class="set-row-l">服务商</span>
+        <select id="setProvider" onchange="updateModelOptions()">
+          <option value="gemini">Google Gemini</option>
+          <option value="qwen">通义千问</option>
+          <option value="deepseek">DeepSeek</option>
+        </select>
+      </div>
+      <div class="set-row">
+        <span class="set-row-l">模型</span>
+        <select id="setModel"></select>
+      </div>
+      <div class="set-row">
+        <span class="set-row-l">API Key</span>
+        <input id="setApiKey" type="password" placeholder="输入 Key">
+      </div>
+    </div>
+    <div class="set-group-title">预算</div>
+    <div class="set-group">
+      <div class="set-row">
+        <span class="set-row-l">月度预算</span>
+        <input id="setBudget" type="number" value="5000" style="font-weight:700">
+      </div>
+    </div>
+    <div class="set-group-title">数据</div>
+    <button class="set-btn" onclick="exportCSV()">导出 CSV</button>
+    <button class="set-btn" onclick="exportJSON()">导出 JSON 备份</button>
+    <button class="set-btn" onclick="importJSON()">导入备份</button>
+    <div style="text-align:center;padding:16px 0;font-size:12px;color:var(--text-3)">AI 智能记账 v1.0</div>
+  </div>
+</div>
+
+<!-- 长按菜单 -->
+<div class="context-menu" id="contextMenu">
+  <button class="ctx-item" onclick="editCurrentRecord()">编辑</button>
+  <button class="ctx-item danger" onclick="deleteCurrentRecord()">删除</button>
+</div>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(e => console.warn('SW registration failed:', e));
+}
+</script>
+
+</body>
+</html>
