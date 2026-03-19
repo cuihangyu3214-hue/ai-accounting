@@ -123,8 +123,8 @@ class Store {
     rows.forEach(r => { settings[r.key] = r.value; });
     return {
       aiProvider: settings.aiProvider || 'gemini',
-      aiModel: settings.aiModel || '',
-      apiKey: settings.apiKey || '',
+      aiModel: settings.aiModel || 'gemini-2.5-flash',
+      apiKey: settings.apiKey || 'AIzaSyC0hifIMkJtCYSdxtZKu5I_QJasyEJRk4k',
       monthlyBudget: settings.monthlyBudget || 5000,
     };
   }
