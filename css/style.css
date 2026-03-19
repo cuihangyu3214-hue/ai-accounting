@@ -181,7 +181,7 @@ html,body{margin:0;padding:0;height:100%;overflow:hidden;background-color:#F0EEF
   backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
   border-top:1px solid var(--glass-border);
   display:flex;
-  padding:6px 0 8px;
+  padding:6px 0 calc(env(safe-area-inset-bottom, 20px) + 4px);
 }
 .tab-item{
   flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
