@@ -122,7 +122,13 @@
 
     <!-- AI 总结 -->
     <div class="sc">
-      <div class="sc-head"><span class="sc-label">AI 分析</span><span class="sc-badge">智能洞察</span></div>
+      <div class="sc-head">
+        <span class="sc-label">AI 分析</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="sc-badge">智能洞察</span>
+          <button id="aiRefreshBtn" onclick="refreshAISummary()" style="background:none;border:none;color:var(--accent);font-size:16px;cursor:pointer;padding:4px" title="刷新分析">↻</button>
+        </div>
+      </div>
       <div class="ai-summary">
         <div class="ai-s-row">
           <div class="ai-s-avatar">

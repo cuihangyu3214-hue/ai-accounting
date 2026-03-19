@@ -449,26 +449,70 @@ async function renderStats() {
   renderDetail(records);
 }
 
-async function renderAISummary(records, budget, prevRecords) {
+// AI 总结缓存 key：年月 → { text, date }
+function getSummaryCacheKey(year, month) {
+  return `ai_summary_${year}_${month}`;
+}
+
+async function renderAISummary(records, budget, prevRecords, forceRefresh) {
   const el = document.getElementById('aiSummaryText');
+  const refreshBtn = document.getElementById('aiRefreshBtn');
   const expenses = records.filter(r => r.type === 'expense');
+
   if (expenses.length === 0) {
     el.textContent = '本月暂无消费数据。';
+    if (refreshBtn) refreshBtn.style.display = 'none';
     return;
   }
+  if (refreshBtn) refreshBtn.style.display = '';
+
+  // 检查缓存：同一天内不重复调用
+  const cacheKey = getSummaryCacheKey(statsYear, statsMonth);
+  const today = todayStr();
+
+  if (!forceRefresh) {
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const data = JSON.parse(cached);
+        if (data.date === today && data.text) {
+          el.innerHTML = formatSummaryText(data.text);
+          return;
+        }
+      }
+    } catch {}
+  }
+
   if (!ai.isConfigured()) {
-    el.innerHTML = '<span style="color:var(--accent)">请先在设置中配置 AI 模型和 API Key，即可获得智能分析。</span><br><br>' + ai._fallbackSummary(records, budget);
+    const fallback = ai._fallbackSummary(records, budget);
+    el.innerHTML = '<span style="color:var(--accent)">未配置 AI，显示基础分析：</span><br><br>' + fallback;
     return;
   }
+
   el.textContent = 'AI 分析中...';
   try {
     const text = await ai.generateSummary(records, budget, prevRecords);
-    el.innerHTML = text
-      .replace(/¥[\d,.]+/g, '<b style="color:var(--red)">$&</b>')
-      .replace(/结余[约]?[\s]*¥?[\d,.]+/g, '<b style="color:var(--green)">$&</b>');
+    // 缓存结果
+    localStorage.setItem(cacheKey, JSON.stringify({ text, date: today }));
+    el.innerHTML = formatSummaryText(text);
   } catch (e) {
     el.textContent = 'AI 分析失败：' + e.message;
   }
+}
+
+function formatSummaryText(text) {
+  return text
+    .replace(/¥[\d,.]+/g, '<b style="color:var(--red)">$&</b>')
+    .replace(/结余[约]?[\s]*¥?[\d,.]+/g, '<b style="color:var(--green)">$&</b>');
+}
+
+async function refreshAISummary() {
+  const records = await store.getRecordsByMonth(statsYear, statsMonth);
+  const settings = await store.getSettings();
+  let prevYear = statsYear, prevMonth = statsMonth - 1;
+  if (prevMonth === 0) { prevMonth = 12; prevYear--; }
+  const prevRecords = await store.getRecordsByMonth(prevYear, prevMonth);
+  await renderAISummary(records, settings.monthlyBudget, prevRecords, true);
 }
 
 function renderCategoryList(expenses, total) {
