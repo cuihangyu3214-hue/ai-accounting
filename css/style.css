@@ -292,33 +292,23 @@ html,body{margin:0;padding:0;height:100%;height:100dvh;overflow:hidden}
   min-height:0;
 }
 
-/* Month card */
-.month-card{
-  border-radius:22px;padding:22px;position:relative;overflow:hidden;
-  background:linear-gradient(135deg,rgba(108,92,231,0.12) 0%,rgba(167,139,250,0.06) 100%);
-  backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
-  border:1px solid rgba(255,255,255,0.5);box-shadow:var(--glass-shadow-lg);
+/* Month strip */
+.month-strip{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 16px;border-radius:16px;
+  background:var(--glass);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);
+  border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);
 }
-.month-card::before{
-  content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;
-  background:radial-gradient(circle,rgba(108,92,231,0.12) 0%,transparent 70%);
+.month-arrow{
+  width:32px;height:32px;border-radius:50%;
+  background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.5);
+  color:var(--text-2);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;transition:all .15s;
 }
-.month-card::after{
-  content:'';position:absolute;bottom:-40px;left:-20px;width:100px;height:100px;border-radius:50%;
-  background:radial-gradient(circle,rgba(167,139,250,0.08) 0%,transparent 70%);
-}
-.mc-row{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
-.mc-month{font-size:14px;font-weight:700;color:var(--text-2)}
-.mc-amount{font-size:32px;font-weight:900;letter-spacing:-1px;margin-top:4px;font-variant-numeric:tabular-nums;color:var(--text);word-break:break-all}
-.mc-amount .cur{font-weight:400;font-size:20px;color:var(--text-2);margin-right:2px}
-.mc-nav{display:flex;gap:8px}
-.mc-nav button{
-  width:38px;height:38px;border-radius:50%;
-  background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.6);
-  color:var(--text-2);backdrop-filter:blur(10px);
-  display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;
-}
-.mc-nav button:active{background:var(--accent);color:white}
+.month-arrow:active{background:var(--accent);color:white;border-color:var(--accent)}
+.month-center{flex:1;text-align:center}
+.month-label{font-size:14px;font-weight:700;color:var(--text-2)}
+.month-total{font-size:24px;font-weight:900;color:var(--text);display:block;margin-top:2px;letter-spacing:-0.5px;font-variant-numeric:tabular-nums}
 
 /* Stats card */
 .sc{

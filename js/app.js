@@ -431,7 +431,7 @@ async function renderStats() {
 
   // 月份 & 总额
   document.getElementById('statsMonthLabel').textContent = `${statsYear}年${statsMonth}月`;
-  document.getElementById('statsTotal').innerHTML = `<span class="cur">¥</span>${total.toLocaleString('zh-CN', { minimumFractionDigits: 2 })}`;
+  document.getElementById('statsTotal').textContent = `¥${total.toFixed(2)}`;
 
   // AI 总结
   renderAISummary(records, settings.monthlyBudget, prevRecords);
