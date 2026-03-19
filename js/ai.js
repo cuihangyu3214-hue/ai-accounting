@@ -74,17 +74,38 @@ class AIService {
       .map(([cat, amt]) => `${cat}: ¥${amt.toFixed(0)}`)
       .join('、');
 
+    // 餐次统计
+    const mealMap = { '早餐': 0, '午餐': 0, '晚餐': 0, '其他餐饮': 0 };
+    const mealCount = { '早餐': 0, '午餐': 0, '晚餐': 0, '其他餐饮': 0 };
+    expenses.filter(r => r.category === '餐饮').forEach(r => {
+      const note = r.note || '';
+      let meal = '其他餐饮';
+      if (/早|早餐|早上/.test(note)) meal = '早餐';
+      else if (/午|午餐|中午|午饭/.test(note)) meal = '午餐';
+      else if (/晚|晚餐|晚上|晚饭|夜宵/.test(note)) meal = '晚餐';
+      mealMap[meal] += r.amount;
+      mealCount[meal]++;
+    });
+    const mealSummary = Object.entries(mealMap)
+      .filter(([_, amt]) => amt > 0)
+      .map(([meal, amt]) => `${meal} ${mealCount[meal]}次 ¥${amt.toFixed(0)}`)
+      .join('、');
+
     let prevTotal = 0;
     if (prevRecords) {
       prevTotal = prevRecords.filter(r => r.type === 'expense').reduce((s, r) => s + r.amount, 0);
     }
 
-    const prompt = `你是一个理财顾问。请根据以下月度消费数据，用 2-3 句简洁的中文给出分析和建议。不要用 markdown 格式。
+    const prompt = `你是一个理财顾问。请根据以下月度消费数据，用 3-5 句简洁的中文给出分析和建议。不要用 markdown 格式。
 月预算：${budget} 元
 本月总支出：¥${total.toFixed(2)}
 上月总支出：¥${prevTotal.toFixed(2)}
 分类明细：${catSummary}
-要求：提到总支出、预算使用率、占比最高的分类、与上月变化、结余预测。语气友好简洁。`;
+餐饮明细（按餐次）：${mealSummary || '无'}
+要求：
+1. 提到总支出、预算使用率、占比最高的分类、结余预测
+2. 如果有餐饮数据，分析早中晚餐的花费情况（哪餐花费最多、平均每餐多少钱、是否合理）
+3. 语气友好简洁`;
 
     try {
       return await this._callAPI(prompt);

@@ -442,6 +442,9 @@ async function renderStats() {
   // 趋势图
   renderTrendChart('trendChart', records);
 
+  // 餐次分布
+  renderMealAnalysis(expenses);
+
   // 账单明细
   renderDetail(records);
 }
@@ -528,6 +531,66 @@ function renderCompare(expenses, prevRecords) {
     <div class="cmp-legend-i"><div class="cmp-dot" style="background:rgba(108,92,231,0.2)"></div>上月</div>
     <div class="cmp-legend-i"><div class="cmp-dot" style="background:var(--accent)"></div>本月</div>
   </div>`;
+}
+
+// ===== 餐次分布 =====
+function renderMealAnalysis(expenses) {
+  const card = document.getElementById('mealCard');
+  const el = document.getElementById('mealList');
+
+  const diningExpenses = expenses.filter(r => r.category === '餐饮');
+  if (diningExpenses.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+
+  const meals = [
+    { name: '早餐', icon: '🌅', color: '#FFA502', bg: 'rgba(255,165,2,0.1)', pattern: /早|早餐|早上/ },
+    { name: '午餐', icon: '☀️', color: '#FF4757', bg: 'rgba(255,71,87,0.1)', pattern: /午|午餐|中午|午饭/ },
+    { name: '晚餐', icon: '🌙', color: '#5352ED', bg: 'rgba(83,82,237,0.1)', pattern: /晚|晚餐|晚上|晚饭|夜宵/ },
+    { name: '其他', icon: '🍽️', color: '#8395A7', bg: 'rgba(131,149,167,0.1)', pattern: null },
+  ];
+
+  const mealData = meals.map(m => ({ ...m, total: 0, count: 0 }));
+
+  diningExpenses.forEach(r => {
+    const note = r.note || '';
+    let matched = false;
+    for (let i = 0; i < 3; i++) {
+      if (meals[i].pattern.test(note)) {
+        mealData[i].total += r.amount;
+        mealData[i].count++;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched) {
+      mealData[3].total += r.amount;
+      mealData[3].count++;
+    }
+  });
+
+  const activeMeals = mealData.filter(m => m.count > 0);
+  if (activeMeals.length === 0) {
+    card.style.display = 'none';
+    return;
+  }
+
+  card.style.display = '';
+  const totalDining = activeMeals.reduce((s, m) => s + m.total, 0);
+
+  el.innerHTML = activeMeals.map(m => {
+    const pct = totalDining > 0 ? ((m.total / totalDining) * 100).toFixed(0) : 0;
+    const avg = m.count > 0 ? (m.total / m.count).toFixed(2) : '0.00';
+    return `<div class="cl-row">
+      <div class="cl-icon" style="background:${m.bg}">${m.icon}</div>
+      <div class="cl-info">
+        <div class="cl-name">${m.name} <span style="font-size:12px;color:var(--text-2);font-weight:500">${m.count}次 · 均¥${avg}</span></div>
+        <div class="cl-bar"><div class="cl-fill" style="width:${pct}%;background:${m.color}"></div></div>
+      </div>
+      <div class="cl-right"><div class="cl-amt">¥${m.total.toFixed(2)}</div><div class="cl-pct">${pct}%</div></div>
+    </div>`;
+  }).join('');
 }
 
 // ===== 账单明细 =====
